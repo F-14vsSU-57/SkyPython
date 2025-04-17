@@ -2,12 +2,14 @@ from datetime import datetime
 import csv
 import mysql.connector
 
+#Input
 name = input("Name : ")
 gender = input("Gender : ")
 d,m,y = input("Enter Birthday (DD/MM/YYYY): ").split("/")
 bd = datetime(int(y),int(m),int(d))
 rn = datetime.now()
 
+#Output
 if (gender.strip().lower() == "male"):
     print("Hello "+"\033[34m"+name+"\033[0m")
 elif (gender.strip().lower() == "female"):
@@ -17,6 +19,7 @@ else:
 time_diff = datetime(1,1,1) + (rn - bd)
 print("Your age is : "+str(time_diff.year-1)+" Years "+str(time_diff.month-1)+" Months "+str(time_diff.day-1)+" Days")
 
+#Save to CSV
 date = str(rn.day)+"/"+str(rn.month)+"/"+str(rn.year)
 time = str(rn.hour)+":"+str(rn.minute)+":"+str(rn.second)
 with open("data.csv", "a") as file:
@@ -24,14 +27,16 @@ with open("data.csv", "a") as file:
         writer.writerow({"name" : name,"gender" : gender,"date" : date,"time" : time})
 print("Data Saved")
 
+#Connect to MySQL Database
 conn = mysql.connector.connect(
     host="localhost",       # Change if your MySQL is hosted remotely
     user="root",            # Your MySQL username
-    database="phpmyadmin"  # The database you want to use
+    database="test"         # The database you want to use
 )
 
 cursor = conn.cursor()
 
+#Create table if not exist 
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS data (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -42,6 +47,7 @@ CREATE TABLE IF NOT EXISTS data (
 )
 """)
 
+#Save to MySQL Database 
 sql = "INSERT INTO data (name, gender , date , time) VALUES (%s, %s, %s, %s)"
 values = (name, gender, date, time)
 cursor.execute(sql, values)
